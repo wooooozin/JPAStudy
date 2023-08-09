@@ -53,4 +53,9 @@ public class ApiNoticeController {
         return noticeModelList;
     }
 
+    @GetMapping("/api/notice/count")
+    public int noticeCount() {
+        return 10;
+    }
+
 }
