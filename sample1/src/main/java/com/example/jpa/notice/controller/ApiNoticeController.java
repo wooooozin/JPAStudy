@@ -25,7 +25,7 @@ public class ApiNoticeController {
 //        noticeModel.setRegDate(LocalDateTime.now());
 //        return noticeModel;
 //    }
-
+/*
     @GetMapping("/api/notice")
     public List<NoticeModel> notice() {
         List<NoticeModel> noticeModelList = new ArrayList<>();
@@ -44,6 +44,12 @@ public class ApiNoticeController {
                 .build();
         noticeModelList.add(noticeModel2);
 
+        return noticeModelList;
+    }
+ */
+    @GetMapping("/api/notice")
+    public List<NoticeModel> notice() {
+        List<NoticeModel> noticeModelList = new ArrayList<>();
         return noticeModelList;
     }
 
