@@ -25,6 +25,8 @@ public class Notice {
     private String contents;
     @Column
     private LocalDateTime regDate;
+    @Column
+    private LocalDateTime updateDate;
 
     @Column
     private int hits;
