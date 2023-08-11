@@ -1,7 +1,9 @@
 package com.example.jpa.notice.controller;
 
 import com.example.jpa.notice.entity.Notice;
+import com.example.jpa.notice.exception.AlreadyDeletedException;
 import com.example.jpa.notice.exception.NoticeNotFoundException;
+import com.example.jpa.notice.model.NoticeDeleteInput;
 import com.example.jpa.notice.model.NoticeInput;
 import com.example.jpa.notice.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
@@ -180,6 +182,51 @@ public class ApiNoticeController {
 
         notice.setHits(notice.getHits() + 1);
         noticeRepository.save(notice);
+    }
+
+//    @DeleteMapping("/api/notice/{id}")
+//    public void deleteNotice(@PathVariable Long id) {
+//        Notice notice = noticeRepository.findById(id)
+//                .orElseThrow(() -> new NoticeNotFoundException("공지사항이 존재 하지 않습니다."));
+//        noticeRepository.delete(notice);
+//    }
+
+    @DeleteMapping("/api/notice/{id}")
+    public void deleteNotice(@PathVariable Long id) {
+        Notice notice = noticeRepository.findById(id)
+                .orElseThrow(() -> new NoticeNotFoundException("공지사항 글이 존재하지 않음"));
+
+        if (notice.isDeleted()) {
+            throw new AlreadyDeletedException("이미 삭제된 공지사항 글입니다.");
+        }
+
+        notice.setDeleted(true);
+        notice.setDeletedDate(LocalDateTime.now());
+        noticeRepository.save(notice);
+    }
+
+    @DeleteMapping("/api/notice")
+    public void deleteNoticeList(
+            @RequestBody NoticeDeleteInput noticeDeleteInput
+    ) {
+        List<Notice> notices = noticeRepository.findByIdIn(noticeDeleteInput.getIdList())
+                .orElseThrow(() -> new NoticeNotFoundException("공지사항이 존재하지 않습니다."));
+        notices.stream().forEach( e -> {
+            e.setDeleted(true);
+            e.setDeletedDate(LocalDateTime.now());
+        });
+
+        noticeRepository.saveAll(notices);
+    }
+
+    @DeleteMapping("/api/notice/all")
+    public void deleteAll() {
+        noticeRepository.deleteAll();
+    }
+
+    @ExceptionHandler(AlreadyDeletedException.class)
+    public ResponseEntity<String> handlerAlreadyDeletedException(AlreadyDeletedException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
     }
 
 }
