@@ -5,13 +5,17 @@ import com.example.jpa.notice.exception.AlreadyDeletedException;
 import com.example.jpa.notice.exception.NoticeNotFoundException;
 import com.example.jpa.notice.model.NoticeDeleteInput;
 import com.example.jpa.notice.model.NoticeInput;
+import com.example.jpa.notice.model.ResponseError;
 import com.example.jpa.notice.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -160,7 +164,7 @@ public class ApiNoticeController {
 //            throw new NoticeNotFoundException("공지사항의 글이 존재하지 않습니다.");
 //        }
         Notice notice = noticeRepository.findById(id)
-                        .orElseThrow(() -> new NoticeNotFoundException("공지사항이 존재하지 않습니다."));
+                .orElseThrow(() -> new NoticeNotFoundException("공지사항이 존재하지 않습니다."));
 
         notice.setTitle(noticeInput.getTitle());
         notice.setContents(noticeInput.getContents());
@@ -211,7 +215,7 @@ public class ApiNoticeController {
     ) {
         List<Notice> notices = noticeRepository.findByIdIn(noticeDeleteInput.getIdList())
                 .orElseThrow(() -> new NoticeNotFoundException("공지사항이 존재하지 않습니다."));
-        notices.stream().forEach( e -> {
+        notices.stream().forEach(e -> {
             e.setDeleted(true);
             e.setDeletedDate(LocalDateTime.now());
         });
@@ -229,6 +233,7 @@ public class ApiNoticeController {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
     }
 
+    /*
     @PostMapping("/api/notice")
     public void addNotice(@RequestBody NoticeInput noticeInput) {
         Notice notice = Notice.builder()
@@ -241,5 +246,29 @@ public class ApiNoticeController {
 
         noticeRepository.save(notice);
     }
+     */
+
+    @PostMapping("/api/notice")
+    public ResponseEntity<Object> addNotice(
+            @RequestBody @Valid NoticeInput noticeInput,
+            Errors errors
+    ) {
+        if (errors.hasErrors()) {
+            List<ResponseError> responseErrors = new ArrayList<>();
+            errors.getAllErrors().stream().forEach(e -> {
+                responseErrors.add(ResponseError.of((FieldError) e));
+            });
+            return new ResponseEntity<>(responseErrors, HttpStatus.BAD_REQUEST);
+        }
+        noticeRepository.save(Notice.builder()
+                .title(noticeInput.getTitle())
+                .contents(noticeInput.getContents())
+                .hits(0)
+                .likes(0)
+                .regDate(LocalDateTime.now())
+                .build());
+        return ResponseEntity.ok().build();
+    }
+
 
 }
