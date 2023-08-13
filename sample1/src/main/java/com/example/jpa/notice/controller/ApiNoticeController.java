@@ -288,6 +288,7 @@ public class ApiNoticeController {
         // 중복 체크
         LocalDateTime checkDate = LocalDateTime.now().minusMinutes(1);
 
+        /*
         Optional<List<Notice>> notices = noticeRepository.findByTitleAndContentsAndRegDateIsGreaterThanEqual(
                 noticeInput.getTitle(),
                 noticeInput.getContents(),
@@ -298,6 +299,17 @@ public class ApiNoticeController {
             if (notices.get().size() > 0) {
                 throw new DuplicateNoticeException("1분 이내에 등록된 동일한 공지사항이 있습니다.");
             }
+        }
+         */
+
+        int noticesCount = noticeRepository.countByTitleAndContentsAndRegDateIsGreaterThanEqual(
+                noticeInput.getTitle(),
+                noticeInput.getContents(),
+                checkDate
+        );
+
+        if (noticesCount > 0) {
+            throw new DuplicateNoticeException("1분 이내에 등록된 동일한 공지사항이 있습니다.");
         }
 
         noticeRepository.save(Notice.builder()
