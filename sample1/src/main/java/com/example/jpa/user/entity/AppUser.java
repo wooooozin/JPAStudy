@@ -32,4 +32,7 @@ public class AppUser {
 
     @Column
     private LocalDateTime regDate;
+
+    @Column
+    private LocalDateTime updateDate;
 }
