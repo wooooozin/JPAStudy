@@ -9,12 +9,12 @@ spring:
     url: jdbc:h2:mem:backofficeDb
     driver-class-name: org.h2.Driver
     username: root
-    password: "1111"
+    password: ""
 
   jpa:
     hibernate:
-      ddl-auto: none
-    generate-ddl: false
+      ddl-auto: create-drop
+    generate-ddl: true
 
     properties:
       format_sql: true
