@@ -110,18 +110,18 @@ public class ApiNoticeController {
 //        return notice;
 //    }
 
-    @PostMapping("/api/notice")
-    public Notice addNotice(@RequestBody NoticeInput noticeInput) {
-        Notice notice = Notice.builder()
-                .title(noticeInput.getTitle())
-                .contents(noticeInput.getContents())
-                .regDate(LocalDateTime.now())
-                .hits(0)
-                .likes(0)
-                .build();
-        Notice resultNotice = noticeRepository.save(notice);
-        return resultNotice;
-    }
+//    @PostMapping("/api/notice")
+//    public Notice addNotice(@RequestBody NoticeInput noticeInput) {
+//        Notice notice = Notice.builder()
+//                .title(noticeInput.getTitle())
+//                .contents(noticeInput.getContents())
+//                .regDate(LocalDateTime.now())
+//                .hits(0)
+//                .likes(0)
+//                .build();
+//        Notice resultNotice = noticeRepository.save(notice);
+//        return resultNotice;
+//    }
 
     @GetMapping("/api/notice/{id}")
     public Notice notice(
@@ -227,6 +227,19 @@ public class ApiNoticeController {
     @ExceptionHandler(AlreadyDeletedException.class)
     public ResponseEntity<String> handlerAlreadyDeletedException(AlreadyDeletedException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+    }
+
+    @PostMapping("/api/notice")
+    public void addNotice(@RequestBody NoticeInput noticeInput) {
+        Notice notice = Notice.builder()
+                .title(noticeInput.getTitle())
+                .contents(noticeInput.getContents())
+                .hits(0)
+                .likes(0)
+                .regDate(LocalDateTime.now())
+                .build();
+
+        noticeRepository.save(notice);
     }
 
 }
