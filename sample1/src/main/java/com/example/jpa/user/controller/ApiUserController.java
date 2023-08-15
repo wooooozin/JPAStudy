@@ -84,7 +84,9 @@ public class ApiUserController {
         AppUser user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
 
-        UserResponse userResponse = new UserResponse(user);
+        // UserResponse userResponse = new UserResponse(user);
+        UserResponse userResponse = UserResponse.of(user);
+
         return userResponse;
     }
 

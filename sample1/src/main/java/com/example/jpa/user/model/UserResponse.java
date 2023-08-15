@@ -22,4 +22,13 @@ public class UserResponse {
         this.userName = user.getUserName();
         this.phone = user.getPhone();
     }
+
+    public static UserResponse of(AppUser user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .userName(user.getUserName())
+                .phone(user.getPhone())
+                .build();
+    }
 }
