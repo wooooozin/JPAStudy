@@ -8,6 +8,9 @@ import com.example.jpa.notice.model.NoticeDeleteInput;
 import com.example.jpa.notice.model.NoticeInput;
 import com.example.jpa.notice.model.ResponseError;
 import com.example.jpa.notice.repository.NoticeRepository;
+import com.example.jpa.user.entity.AppUser;
+import com.example.jpa.user.exception.UserNotFoundException;
+import com.example.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,6 +33,7 @@ import java.util.Optional;
 public class ApiNoticeController {
 
     private final NoticeRepository noticeRepository;
+    private final UserRepository userRepository;
 
 //    @GetMapping("/api/notice")
 //    public String noticeString() {
@@ -283,24 +287,19 @@ public class ApiNoticeController {
 
     @PostMapping("/api/notice")
     public ResponseEntity<Object> addNotice(
-            @RequestBody @Valid NoticeInput noticeInput
+            @RequestBody @Valid NoticeInput noticeInput,
+            @RequestParam Long userId
     ) {
+
+        Optional<AppUser> optionalAppUser = userRepository.findById(userId);
+        if(!optionalAppUser.isPresent()) {
+            throw new IllegalArgumentException("잘못된 사용자 ID 입니다.");
+        }
+
+        AppUser user = optionalAppUser.get();
         // 중복 체크
         LocalDateTime checkDate = LocalDateTime.now().minusMinutes(1);
 
-        /*
-        Optional<List<Notice>> notices = noticeRepository.findByTitleAndContentsAndRegDateIsGreaterThanEqual(
-                noticeInput.getTitle(),
-                noticeInput.getContents(),
-                checkDate
-        );
-
-        if (notices.isPresent()) {
-            if (notices.get().size() > 0) {
-                throw new DuplicateNoticeException("1분 이내에 등록된 동일한 공지사항이 있습니다.");
-            }
-        }
-         */
 
         int noticesCount = noticeRepository.countByTitleAndContentsAndRegDateIsGreaterThanEqual(
                 noticeInput.getTitle(),
@@ -317,6 +316,7 @@ public class ApiNoticeController {
                 .contents(noticeInput.getContents())
                 .hits(0)
                 .likes(0)
+                .user(user)
                 .regDate(LocalDateTime.now())
                 .build());
         return ResponseEntity.ok().build();
