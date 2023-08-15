@@ -4,6 +4,7 @@ import com.example.jpa.notice.model.ResponseError;
 import com.example.jpa.user.entity.AppUser;
 import com.example.jpa.user.exception.UserNotFoundException;
 import com.example.jpa.user.model.UserInput;
+import com.example.jpa.user.model.UserResponse;
 import com.example.jpa.user.model.UserUpdate;
 import com.example.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -74,6 +75,17 @@ public class ApiUserController {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<?> userNotFoundExceptionHandler(UserNotFoundException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("/api/user/{id}")
+    public UserResponse getUser(
+            @PathVariable Long id
+    ) {
+        AppUser user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
+
+        UserResponse userResponse = new UserResponse(user);
+        return userResponse;
     }
 
 }
