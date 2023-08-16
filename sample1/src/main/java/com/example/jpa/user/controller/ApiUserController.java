@@ -23,6 +23,7 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -191,7 +192,7 @@ public class ApiUserController {
         if (userRepository.countByEmail(userInput.getEmail()) > 0) {
             throw new ExistsEmailException("이미 가입된 이메일 주소입니다.");
         }
-        String encryptPassword = getEncryptPassword(userInput);
+        String encryptPassword = getEncryptPassword(userInput.getPassword());
 
         AppUser user = AppUser.builder()
                 .email(userInput.getEmail())
@@ -204,9 +205,9 @@ public class ApiUserController {
         return ResponseEntity.ok().build();
     }
 
-    private static String getEncryptPassword(UserInput userInput) {
+    private static String getEncryptPassword(String password) {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        return bCryptPasswordEncoder.encode(userInput.getPassword());
+        return bCryptPasswordEncoder.encode(password);
     }
 
     @DeleteMapping("/api/user/{id}")
@@ -241,6 +242,33 @@ public class ApiUserController {
 
         UserResponse userResponse = UserResponse.of(user);
         return ResponseEntity.ok().body(userResponse);
+    }
+
+    @GetMapping("/api/user/{id}/password/reset")
+    public ResponseEntity<?> resetUserPassword(
+            @PathVariable Long id
+    ) {
+        AppUser user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
+
+        // 비밀번호 초기화
+        // UUID로 만들어서 랜덤한 문자열을 전달해준다.
+        String resetPassword = getResetPassword();
+        String resetEncryptPassword = getEncryptPassword(resetPassword);
+        user.setPassword(resetEncryptPassword);
+        userRepository.save(user);
+
+        String message = String.format("[%s]님의 임시 비밀번호는 %s 로 초기화 되었습니다.", user.getUserName(), resetPassword);
+        sendSMS(message);
+        return ResponseEntity.ok().build();
+    }
+
+    void sendSMS(String message) {
+        System.out.println("문자 메세지 전송");
+        System.out.println(message);
+    }
+    private String getResetPassword() {
+       return UUID.randomUUID().toString().replaceAll("-", "").substring(0, 10);
     }
 
 }
