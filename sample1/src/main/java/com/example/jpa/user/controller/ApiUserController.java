@@ -8,14 +8,13 @@ import com.example.jpa.user.entity.AppUser;
 import com.example.jpa.user.exception.ExistsEmailException;
 import com.example.jpa.user.exception.PasswordNotMatchException;
 import com.example.jpa.user.exception.UserNotFoundException;
-import com.example.jpa.user.model.UserInput;
-import com.example.jpa.user.model.UserInputPassword;
-import com.example.jpa.user.model.UserResponse;
-import com.example.jpa.user.model.UserUpdate;
+import com.example.jpa.user.model.*;
 import com.example.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -115,33 +114,33 @@ public class ApiUserController {
         return noticeResponses;
     }
 
-    @PostMapping("/api/user")
-    public ResponseEntity<?> addUser(
-            @RequestBody UserInput userInput,
-            Errors errors
-    ) {
-        List<ResponseError> responseErrors = new ArrayList<>();
-        if (errors.hasErrors()) {
-            errors.getAllErrors().stream().forEach((e) -> {
-                responseErrors.add(ResponseError.of((FieldError) e));
-            });
-            return new ResponseEntity<>(responseErrors, HttpStatus.BAD_REQUEST);
-        }
-
-        if (userRepository.countByEmail(userInput.getEmail()) > 0) {
-            throw new ExistsEmailException("이미 가입된 이메일 주소입니다.");
-        }
-
-        AppUser user = AppUser.builder()
-                .email(userInput.getEmail())
-                .userName(userInput.getUserName())
-                .phone(userInput.getPhone())
-                .password(userInput.getPassword())
-                .regDate(LocalDateTime.now())
-                .build();
-        userRepository.save(user);
-        return ResponseEntity.ok().build();
-    }
+//    @PostMapping("/api/user")
+//    public ResponseEntity<?> addUser(
+//            @RequestBody UserInput userInput,
+//            Errors errors
+//    ) {
+//        List<ResponseError> responseErrors = new ArrayList<>();
+//        if (errors.hasErrors()) {
+//            errors.getAllErrors().stream().forEach((e) -> {
+//                responseErrors.add(ResponseError.of((FieldError) e));
+//            });
+//            return new ResponseEntity<>(responseErrors, HttpStatus.BAD_REQUEST);
+//        }
+//
+//        if (userRepository.countByEmail(userInput.getEmail()) > 0) {
+//            throw new ExistsEmailException("이미 가입된 이메일 주소입니다.");
+//        }
+//
+//        AppUser user = AppUser.builder()
+//                .email(userInput.getEmail())
+//                .userName(userInput.getUserName())
+//                .phone(userInput.getPhone())
+//                .password(userInput.getPassword())
+//                .regDate(LocalDateTime.now())
+//                .build();
+//        userRepository.save(user);
+//        return ResponseEntity.ok().build();
+//    }
 
     @ExceptionHandler(ExistsEmailException.class)
     public ResponseEntity<?> ExistsEmailExceptionHandler(ExistsEmailException exception) {
@@ -174,6 +173,74 @@ public class ApiUserController {
     @ExceptionHandler(PasswordNotMatchException.class)
     public ResponseEntity<?> passwordNotMatchExceptionHandler(PasswordNotMatchException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping("/api/user")
+    public ResponseEntity<?> addUser(
+            @RequestBody UserInput userInput,
+            Errors errors
+    ) {
+        List<ResponseError> responseErrors = new ArrayList<>();
+        if (errors.hasErrors()) {
+            errors.getAllErrors().stream().forEach((e) -> {
+                responseErrors.add(ResponseError.of((FieldError) e));
+            });
+            return new ResponseEntity<>(responseErrors, HttpStatus.BAD_REQUEST);
+        }
+
+        if (userRepository.countByEmail(userInput.getEmail()) > 0) {
+            throw new ExistsEmailException("이미 가입된 이메일 주소입니다.");
+        }
+        String encryptPassword = getEncryptPassword(userInput);
+
+        AppUser user = AppUser.builder()
+                .email(userInput.getEmail())
+                .userName(userInput.getUserName())
+                .phone(userInput.getPhone())
+                .password(encryptPassword)
+                .regDate(LocalDateTime.now())
+                .build();
+        userRepository.save(user);
+        return ResponseEntity.ok().build();
+    }
+
+    private static String getEncryptPassword(UserInput userInput) {
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        return bCryptPasswordEncoder.encode(userInput.getPassword());
+    }
+
+    @DeleteMapping("/api/user/{id}")
+    public ResponseEntity<?> deleteUser(
+            @PathVariable Long id
+    ) {
+        AppUser user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
+
+        // 작성한 공지사항이 있는 경우 - 계정 삭제 불가, 공지사항 삭제하고 탈퇴 시도해줘
+        // 아니면 공지사항을 다 삭제하겠다..
+        // 아니면 게시글은 유지하되 계정정보만 탈퇴한 회원으로 변경?
+
+        try {
+            userRepository.delete(user);
+        } catch (DataIntegrityViolationException e) {
+            String message = "제약 조건에 문제가 발생했습니다.";
+            return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            String message = "회원 탈퇴 중 문제가 발생했습니다.";
+            return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("api/user/find")
+    public ResponseEntity<?> findUser(
+            @RequestBody UserInputFind userInputFind
+    ) {
+        AppUser user = userRepository.findByUserNameAndPhone(userInputFind.getUserName(), userInputFind.getPhone())
+                .orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
+
+        UserResponse userResponse = UserResponse.of(user);
+        return ResponseEntity.ok().body(userResponse);
     }
 
 }
