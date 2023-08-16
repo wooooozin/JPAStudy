@@ -6,13 +6,14 @@ import com.example.jpa.notice.model.ResponseError;
 import com.example.jpa.notice.repository.NoticeRepository;
 import com.example.jpa.user.entity.AppUser;
 import com.example.jpa.user.exception.ExistsEmailException;
+import com.example.jpa.user.exception.PasswordNotMatchException;
 import com.example.jpa.user.exception.UserNotFoundException;
 import com.example.jpa.user.model.UserInput;
+import com.example.jpa.user.model.UserInputPassword;
 import com.example.jpa.user.model.UserResponse;
 import com.example.jpa.user.model.UserUpdate;
 import com.example.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -146,4 +147,33 @@ public class ApiUserController {
     public ResponseEntity<?> ExistsEmailExceptionHandler(ExistsEmailException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @PatchMapping("/api/user/{id}/password")
+    public ResponseEntity<?> updateUserPassword(
+            @PathVariable Long id,
+            @RequestBody @Valid UserInputPassword userInputPassword,
+            Errors errors
+    ) {
+        List<ResponseError> responseErrors = new ArrayList<>();
+        if (errors.hasErrors()) {
+            errors.getAllErrors().stream().forEach((e) -> {
+                responseErrors.add(ResponseError.of((FieldError) e));
+            });
+            return new ResponseEntity<>(responseErrors, HttpStatus.BAD_REQUEST);
+        }
+
+        AppUser user = userRepository.findByIdAndPassword(id, userInputPassword.getPassword())
+                .orElseThrow(() -> new PasswordNotMatchException("비밀번호가 일치하지 않습니다."));
+
+        user.setPassword(userInputPassword.getNewPassword());
+        userRepository.save(user);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @ExceptionHandler(PasswordNotMatchException.class)
+    public ResponseEntity<?> passwordNotMatchExceptionHandler(PasswordNotMatchException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
 }
