@@ -330,8 +330,11 @@ public class ApiUserController {
             throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
         }
 
+        LocalDateTime expiredDateTime = LocalDateTime.now().plusMonths(1);
+        Date expiredDate = java.sql.Timestamp.valueOf(expiredDateTime);
+
         String token = JWT.create()
-                .withExpiresAt(new Date())
+                .withExpiresAt(expiredDate)
                 .withClaim("user_id", user.getId())
                 .withSubject(user.getUserName())
                 .withIssuer(user.getEmail())
