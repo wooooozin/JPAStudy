@@ -1,5 +1,7 @@
 package com.example.jpa.user.controller;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.example.jpa.notice.entity.Notice;
 import com.example.jpa.notice.entity.NoticeLike;
 import com.example.jpa.notice.model.NoticeResponse;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -285,6 +288,29 @@ public class ApiUserController {
     }
 
 
+//    @PostMapping("/api/user/login")
+//    public ResponseEntity<?> createToken(
+//            @RequestBody @Valid UserLogin userLogin,
+//            Errors errors
+//    ) {
+//        List<ResponseError> responseErrors = new ArrayList<>();
+//        if (errors.hasErrors()) {
+//            errors.getAllErrors().stream().forEach((e) -> {
+//                responseErrors.add(ResponseError.of((FieldError) e));
+//            });
+//            return new ResponseEntity<>(responseErrors, HttpStatus.BAD_REQUEST);
+//        }
+//
+//        AppUser user = userRepository.findByEmail(userLogin.getEmail())
+//                .orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
+//        if (!PasswordUtils.equalPassword(userLogin.getPassword(), user.getPassword())) {
+//            throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
+//        }
+//        System.out.println(userLogin.getPassword());
+//        System.out.println(user.getPassword());
+//        return ResponseEntity.ok().build();
+//    }
+
     @PostMapping("/api/user/login")
     public ResponseEntity<?> createToken(
             @RequestBody @Valid UserLogin userLogin,
@@ -303,8 +329,14 @@ public class ApiUserController {
         if (!PasswordUtils.equalPassword(userLogin.getPassword(), user.getPassword())) {
             throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
         }
-        System.out.println(userLogin.getPassword());
-        System.out.println(user.getPassword());
-        return ResponseEntity.ok().build();
+
+        String token = JWT.create()
+                .withExpiresAt(new Date())
+                .withClaim("user_id", user.getId())
+                .withSubject(user.getUserName())
+                .withIssuer(user.getEmail())
+                .sign(Algorithm.HMAC512("zerobase".getBytes()));
+
+        return ResponseEntity.ok().body(UserLoginToken.builder().token(token).build());
     }
 }
