@@ -15,6 +15,7 @@ import com.example.jpa.user.exception.PasswordNotMatchException;
 import com.example.jpa.user.exception.UserNotFoundException;
 import com.example.jpa.user.model.*;
 import com.example.jpa.user.repository.UserRepository;
+import com.example.jpa.util.JWTUtils;
 import com.example.jpa.util.PasswordUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -375,4 +376,27 @@ public class ApiUserController {
 
         return ResponseEntity.ok().body(UserLoginToken.builder().token(newToken).build());
     }
+
+    @DeleteMapping("/api/user/login")
+    public ResponseEntity<?> removeToken(
+            @RequestHeader("Z-TOKEN") String token
+    ) {
+        String email = "";
+        try {
+            email = JWTUtils.getIssuer(token);
+        } catch (SignatureVerificationException e) {
+            return new ResponseEntity<>("Token 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 세션, 쿠키 삭제
+        // 클라이언트 - 쿠키/로컬스토리지/세션스토리지
+        // 블랙리스트 작성
+
+
+
+        return ResponseEntity.ok().build();
+    }
+
 }
