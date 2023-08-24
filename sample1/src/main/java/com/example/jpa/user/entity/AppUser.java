@@ -39,4 +39,7 @@ public class AppUser {
 
     @Column
     private UserStatus status;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean lockYn;
 }

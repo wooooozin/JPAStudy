@@ -102,4 +102,38 @@ public class AdminUserController {
         List<UserLoginHistory> userLoginHistories = userLoginRepository.findAll();
         return ResponseEntity.ok().body(userLoginHistories);
     }
+
+    @PatchMapping("/api/admin/user/{id}/lock")
+    public ResponseEntity<?> userLock(
+            @PathVariable Long id
+    ) {
+        Optional<AppUser> optionalAppUser = userRepository.findById(id);
+        if (!optionalAppUser.isPresent()) {
+            return new ResponseEntity<>(ResponseMessage.fail("사용자 정보가 존재하지 않습니다."), HttpStatus.BAD_REQUEST);
+        }
+        AppUser user = optionalAppUser.get();
+        if (user.isLockYn()) {
+            return new ResponseEntity<>(ResponseMessage.fail("이미 제한된 사용자 입니다."), HttpStatus.BAD_REQUEST);
+        }
+        user.setLockYn(true);
+        userRepository.save(user);
+        return ResponseEntity.ok().body(ResponseMessage.success());
+    }
+
+    @PatchMapping("/api/admin/user/{id}/unlock")
+    public ResponseEntity<?> userUnlock(
+            @PathVariable Long id
+    ) {
+        Optional<AppUser> optionalAppUser = userRepository.findById(id);
+        if (!optionalAppUser.isPresent()) {
+            return new ResponseEntity<>(ResponseMessage.fail("사용자 정보가 존재하지 않습니다."), HttpStatus.BAD_REQUEST);
+        }
+        AppUser user = optionalAppUser.get();
+        if (!user.isLockYn()) {
+            return new ResponseEntity<>(ResponseMessage.fail("접속제한 대상이 아닙니다."), HttpStatus.BAD_REQUEST);
+        }
+        user.setLockYn(false);
+        userRepository.save(user);
+        return ResponseEntity.ok().body(ResponseMessage.success());
+    }
 }
