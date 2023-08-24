@@ -210,6 +210,7 @@ public class ApiUserController {
                 .phone(userInput.getPhone())
                 .password(encryptPassword)
                 .regDate(LocalDateTime.now())
+                .status(userInput.getStatus())
                 .build();
         userRepository.save(user);
         return ResponseEntity.ok().build();
