@@ -2,10 +2,12 @@ package com.example.jpa.user.controller;
 
 import com.example.jpa.notice.repository.NoticeRepository;
 import com.example.jpa.user.entity.AppUser;
+import com.example.jpa.user.entity.UserLoginHistory;
 import com.example.jpa.user.exception.UserNotFoundException;
 import com.example.jpa.user.model.ResponseMessage;
 import com.example.jpa.user.model.UserSearch;
 import com.example.jpa.user.model.UserStatusInput;
+import com.example.jpa.user.repository.UserLoginRepository;
 import com.example.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ public class AdminUserController {
 
     private final UserRepository userRepository;
     private final NoticeRepository noticeRepository;
+    private final UserLoginRepository userLoginRepository;
 
 //    @GetMapping("/api/admin/user")
 //    public ResponseMessage userList() {
@@ -92,6 +95,11 @@ public class AdminUserController {
         userRepository.delete(user);
 
         return ResponseEntity.ok().build();
+    }
 
+    @GetMapping("/api/admin/user/login/history")
+    public ResponseEntity<?> userLoginHistory() {
+        List<UserLoginHistory> userLoginHistories = userLoginRepository.findAll();
+        return ResponseEntity.ok().body(userLoginHistories);
     }
 }
