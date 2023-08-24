@@ -1,5 +1,6 @@
 package com.example.jpa.user.controller;
 
+import com.example.jpa.notice.repository.NoticeRepository;
 import com.example.jpa.user.entity.AppUser;
 import com.example.jpa.user.exception.UserNotFoundException;
 import com.example.jpa.user.model.ResponseMessage;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class AdminUserController {
 
     private final UserRepository userRepository;
+    private final NoticeRepository noticeRepository;
 
 //    @GetMapping("/api/admin/user")
 //    public ResponseMessage userList() {
@@ -71,5 +73,25 @@ public class AdminUserController {
         user.setStatus(userStatusInput.getStatus());
         userRepository.save(user);
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/api/admin/user/{id}")
+    public ResponseEntity<?> deleteUser(
+            @PathVariable Long id
+    ) {
+        Optional<AppUser> optionalAppUser = userRepository.findById(id);
+        if (!optionalAppUser.isPresent()) {
+            return new ResponseEntity<>(ResponseMessage.fail("사용자 정보가 존재하지 않습니다."), HttpStatus.BAD_REQUEST);
+        }
+
+        AppUser user = optionalAppUser.get();
+        if (noticeRepository.countByUser(user) > 0) {
+            return new ResponseEntity<>(ResponseMessage.fail("사용자가 작성한 글이 있습니다."), HttpStatus.BAD_REQUEST);
+        }
+
+        userRepository.delete(user);
+
+        return ResponseEntity.ok().build();
+
     }
 }

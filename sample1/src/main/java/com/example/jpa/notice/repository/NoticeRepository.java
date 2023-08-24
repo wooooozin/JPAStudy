@@ -27,4 +27,6 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
     );
 
     List<Notice> findByUser(AppUser user);
+
+    long countByUser(AppUser user);
 }
