@@ -163,4 +163,10 @@ public class AdminUserController {
         List<UserLogCount> userNoticeCounts = userService.getUserLogCount();
         return ResponseEntity.ok().body(userNoticeCounts);
     }
+
+    @GetMapping("/api/admin/user/like/best")
+    public ResponseEntity<?> bestLikeCount() {
+        List<UserLogCount> userNoticeCounts = userService.getBestLikeUser();
+        return ResponseEntity.ok().body(userNoticeCounts);
+    }
 }
