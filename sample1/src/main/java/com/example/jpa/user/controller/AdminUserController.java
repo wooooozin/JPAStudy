@@ -147,4 +147,10 @@ public class AdminUserController {
 
         return ResponseEntity.ok().body(ResponseMessage.success(userSummary));
     }
+
+    @GetMapping("/api/admin/user/today")
+    public ResponseEntity<?> todayUser() {
+        List<AppUser> users = userService.getTodayUsers();
+        return ResponseEntity.ok().body(ResponseMessage.success(users));
+    }
 }
