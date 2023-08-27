@@ -1,6 +1,7 @@
 package com.example.jpa.user.service;
 
 import com.example.jpa.user.entity.AppUser;
+import com.example.jpa.user.model.UserLogCount;
 import com.example.jpa.user.model.UserNoticeCount;
 import com.example.jpa.user.model.UserSummary;
 import org.springframework.stereotype.Service;
@@ -14,4 +15,6 @@ public interface UserService {
     List<AppUser> getTodayUsers();
 
     List<UserNoticeCount> getUserNoticeCount();
+
+    List<UserLogCount> getUserLogCount();
 }

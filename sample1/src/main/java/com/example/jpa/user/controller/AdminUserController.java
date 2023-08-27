@@ -160,6 +160,7 @@ public class AdminUserController {
 
     @GetMapping("/api/admin/user/log/count")
     public ResponseEntity<?> userLogCount() {
-
+        List<UserLogCount> userNoticeCounts = userService.getUserLogCount();
+        return ResponseEntity.ok().body(userNoticeCounts);
     }
 }
