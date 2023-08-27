@@ -4,10 +4,7 @@ import com.example.jpa.notice.repository.NoticeRepository;
 import com.example.jpa.user.entity.AppUser;
 import com.example.jpa.user.entity.UserLoginHistory;
 import com.example.jpa.user.exception.UserNotFoundException;
-import com.example.jpa.user.model.ResponseMessage;
-import com.example.jpa.user.model.UserSearch;
-import com.example.jpa.user.model.UserStatusInput;
-import com.example.jpa.user.model.UserSummary;
+import com.example.jpa.user.model.*;
 import com.example.jpa.user.repository.UserLoginRepository;
 import com.example.jpa.user.repository.UserRepository;
 import com.example.jpa.user.service.UserService;
@@ -152,5 +149,17 @@ public class AdminUserController {
     public ResponseEntity<?> todayUser() {
         List<AppUser> users = userService.getTodayUsers();
         return ResponseEntity.ok().body(ResponseMessage.success(users));
+    }
+
+
+    @GetMapping("/api/admin/user/notice/count")
+    public ResponseEntity<?> userNoticeCount() {
+        List<UserNoticeCount> userNoticeCounts = userService.getUserNoticeCount();
+        return ResponseEntity.ok().body(userNoticeCounts);
+    }
+
+    @GetMapping("/api/admin/user/log/count")
+    public ResponseEntity<?> userLogCount() {
+
     }
 }
