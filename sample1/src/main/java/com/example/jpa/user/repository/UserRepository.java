@@ -1,6 +1,7 @@
 package com.example.jpa.user.repository;
 
 import com.example.jpa.user.entity.AppUser;
+import com.example.jpa.user.model.UserStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -21,4 +22,6 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
     List<AppUser> findByEmailContainsOrUserNameContainsOrPhoneNotContains(
             String email, String userName, String phone
     );
+
+    long countByStatus(UserStatus userStatus);
 }

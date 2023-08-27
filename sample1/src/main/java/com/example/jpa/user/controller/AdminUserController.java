@@ -7,8 +7,10 @@ import com.example.jpa.user.exception.UserNotFoundException;
 import com.example.jpa.user.model.ResponseMessage;
 import com.example.jpa.user.model.UserSearch;
 import com.example.jpa.user.model.UserStatusInput;
+import com.example.jpa.user.model.UserSummary;
 import com.example.jpa.user.repository.UserLoginRepository;
 import com.example.jpa.user.repository.UserRepository;
+import com.example.jpa.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +27,9 @@ public class AdminUserController {
     private final NoticeRepository noticeRepository;
     private final UserLoginRepository userLoginRepository;
 
-//    @GetMapping("/api/admin/user")
+    private final UserService userService;
+
+    //    @GetMapping("/api/admin/user")
 //    public ResponseMessage userList() {
 //        List<AppUser> userList = userRepository.findAll();
 //        long totalUserCont = userRepository.count();
@@ -135,5 +139,12 @@ public class AdminUserController {
         user.setLockYn(false);
         userRepository.save(user);
         return ResponseEntity.ok().body(ResponseMessage.success());
+    }
+
+    @GetMapping("/api/admin/user/status/count")
+    public ResponseEntity<?> userStatusCount() {
+        UserSummary userSummary = userService.getUserStatusCount();
+
+        return ResponseEntity.ok().body(ResponseMessage.success(userSummary));
     }
 }
