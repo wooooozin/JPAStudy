@@ -5,4 +5,6 @@ import com.example.jpa.board.model.ServiceResult;
 
 public interface BoardService {
     ServiceResult addBoard(BoardTypeInput boardTypeInput);
+
+    ServiceResult update(long id, BoardTypeInput boardTypeInput);
 }
