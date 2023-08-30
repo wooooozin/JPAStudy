@@ -58,7 +58,7 @@ public class ApiBoardController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/api/board/{id}")
+    @DeleteMapping("/api/board/type/{id}")
     public ResponseEntity<?> deleteBoardType(
             @PathVariable Long id
     ) {
@@ -68,6 +68,13 @@ public class ApiBoardController {
             return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
         }
         return ResponseEntity.ok().body(ResponseMessage.success());
+    }
+
+    @GetMapping("/api/board/type")
+    public ResponseEntity<?> boardType() {
+        List<BoardType> boardTypeList = boardService.getAllType();
+
+        return ResponseEntity.ok().body(ResponseMessage.success(boardTypeList));
     }
 
 }
