@@ -7,4 +7,6 @@ public interface BoardService {
     ServiceResult addBoard(BoardTypeInput boardTypeInput);
 
     ServiceResult update(long id, BoardTypeInput boardTypeInput);
+
+    ServiceResult deleteBoard(Long id);
 }

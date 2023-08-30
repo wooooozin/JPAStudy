@@ -56,8 +56,18 @@ public class ApiBoardController {
             return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
         }
         return ResponseEntity.ok().build();
-
     }
 
+    @DeleteMapping("/api/board/{id}")
+    public ResponseEntity<?> deleteBoardType(
+            @PathVariable Long id
+    ) {
+        ServiceResult result = boardService.deleteBoard(id);
+
+        if (!result.isResult()) {
+            return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+        }
+        return ResponseEntity.ok().body(ResponseMessage.success());
+    }
 
 }
