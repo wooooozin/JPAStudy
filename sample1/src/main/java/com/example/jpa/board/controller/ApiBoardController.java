@@ -2,6 +2,7 @@ package com.example.jpa.board.controller;
 
 import com.example.jpa.board.entity.BoardType;
 import com.example.jpa.board.model.BoardTypeInput;
+import com.example.jpa.board.model.BoardTypeUsing;
 import com.example.jpa.board.model.ServiceResult;
 import com.example.jpa.board.service.BoardService;
 import com.example.jpa.notice.model.ResponseError;
@@ -77,4 +78,15 @@ public class ApiBoardController {
         return ResponseEntity.ok().body(ResponseMessage.success(boardTypeList));
     }
 
+    @PatchMapping("/api/board/type/{id}/using")
+    public ResponseEntity<?> usingBoardType(
+            @PathVariable Long id,
+            @RequestBody BoardTypeUsing boardTypeUsing
+    ) {
+        ServiceResult result = boardService.setBoardTypeUsing(id, boardTypeUsing);
+        if (!result.isResult()) {
+            return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+        }
+        return ResponseEntity.ok().body(ResponseMessage.success(result));
+    }
 }

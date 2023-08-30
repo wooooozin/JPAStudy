@@ -2,6 +2,7 @@ package com.example.jpa.board.service;
 
 import com.example.jpa.board.entity.BoardType;
 import com.example.jpa.board.model.BoardTypeInput;
+import com.example.jpa.board.model.BoardTypeUsing;
 import com.example.jpa.board.model.ServiceResult;
 import com.example.jpa.board.repository.BoardRepository;
 import com.example.jpa.board.repository.BoardTypeRepository;
@@ -28,6 +29,7 @@ public class BoardServiceImpl implements BoardService {
         BoardType addBoardType = BoardType.builder()
                 .boardName(boardTypeInput.getTitle())
                 .regDate(LocalDateTime.now())
+                .usingYn(true)
                 .build();
         boardTypeRepository.save(addBoardType);
         return ServiceResult.success();
@@ -72,5 +74,18 @@ public class BoardServiceImpl implements BoardService {
     public List<BoardType> getAllType() {
 
         return boardTypeRepository.findAll();
+    }
+
+    @Override
+    public ServiceResult setBoardTypeUsing(Long id, BoardTypeUsing boardTypeUsing) {
+        Optional<BoardType> optionalBoardType = boardTypeRepository.findById(id);
+        if (!optionalBoardType.isPresent()) {
+            return ServiceResult.fail("삭제할 게시판 타입이 없습니다.");
+        }
+        BoardType boardType = optionalBoardType.get();
+        boardType.setUsingYn(boardTypeUsing.isUsingYn());
+        boardType.setUpdateDate(LocalDateTime.now());
+        boardTypeRepository.save(boardType);
+        return ServiceResult.success();
     }
 }
