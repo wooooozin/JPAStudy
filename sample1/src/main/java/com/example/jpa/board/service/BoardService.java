@@ -21,5 +21,5 @@ public interface BoardService {
 
     List<BoardTypeCount> getBoardTypeCount();
 
-    ServiceResult setBoardTop(Long id);
+    ServiceResult setBoardTop(Long id, boolean isClear);
 }
