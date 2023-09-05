@@ -21,4 +21,7 @@ public interface BoardService {
     ServiceResult setBoardTop(Long id, boolean isClear);
 
     ServiceResult setBoardPeriod(Long id, BoardPeriod boardPeriod);
+
+    ServiceResult setBoardHits(Long id, String email);
+
 }

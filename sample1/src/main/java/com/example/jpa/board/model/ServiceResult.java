@@ -28,4 +28,8 @@ public class ServiceResult {
                 .build();
 
     }
+
+    public boolean isFail() {
+        return !result;
+    }
 }
