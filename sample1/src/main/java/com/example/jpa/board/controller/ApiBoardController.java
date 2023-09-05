@@ -96,4 +96,12 @@ public class ApiBoardController {
         List<BoardTypeCount> boardTypeCounts = boardService.getBoardTypeCount();
         return ResponseEntity.ok().body(ResponseMessage.success(boardTypeCounts));
     }
+
+    @PatchMapping("/api/board/{id}/top")
+    public ResponseEntity<?> boardPostTop(
+            @PathVariable Long id
+    ) {
+        ServiceResult result = boardService.setBoardTop(id);
+        return ResponseEntity.ok().body(result);
+    }
 }
