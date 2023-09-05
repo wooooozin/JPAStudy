@@ -43,4 +43,10 @@ public class Board {
 
     @Column
     private boolean topYn;
+
+    @Column
+    private LocalDate publishStartDate;
+
+    @Column
+    private LocalDate publishEndtDate;
 }
