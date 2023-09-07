@@ -158,4 +158,20 @@ public class ApiBoardController {
         ServiceResult result = boardService.setBoardLike(id, email);
         return ResponseResult.result(result);
     }
+
+    @PutMapping("/api/board/{id}/unlike")
+    public ResponseEntity<?> boardUnLike(
+            @PathVariable Long id,
+            @RequestHeader("Z-TOKEN") String token
+    ) {
+        String email = "";
+        try {
+            email = JWTUtils.getIssuer(token);
+        } catch (JWTVerificationException e) {
+            return ResponseResult.fail("토큰 정보가 정확하지 않습니다.");
+        }
+
+        ServiceResult result = boardService.setBoardUnLike(id, email);
+        return ResponseResult.result(result);
+    }
 }
