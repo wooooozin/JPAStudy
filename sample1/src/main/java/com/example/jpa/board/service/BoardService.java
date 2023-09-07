@@ -34,4 +34,6 @@ public interface BoardService {
     List<BoardBadReport> badRepertList();
 
     ServiceResult scrapBoard(Long id, String email);
+
+    ServiceResult removeScrap(Long id, String email);
 }

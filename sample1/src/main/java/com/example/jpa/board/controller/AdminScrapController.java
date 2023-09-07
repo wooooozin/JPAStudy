@@ -32,4 +32,20 @@ public class AdminScrapController {
         return ResponseResult.result(boardService.scrapBoard(id, email));
     }
 
+    @DeleteMapping("/api/board/scrap/{id}")
+    public ResponseEntity<?> deleteBoardScrao(
+            @PathVariable Long id,
+            @RequestHeader("Z-TOKEN") String token
+    ) {
+        String email = "";
+        try {
+            email = JWTUtils.getIssuer(token);
+        } catch (JWTVerificationException e) {
+            return ResponseResult.fail("토큰 정보가 정확하지 않습니다.");
+        }
+
+        return ResponseResult.result(boardService.removeScrap(id, email));
+    }
+
+
 }

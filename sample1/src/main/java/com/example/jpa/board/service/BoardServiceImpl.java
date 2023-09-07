@@ -281,5 +281,27 @@ public class BoardServiceImpl implements BoardService {
         return ServiceResult.success();
     }
 
+    @Override
+    public ServiceResult removeScrap(Long id, String email) {
+        Optional<BoardScrap> optionalBoardScrap = boardScrapRepository.findById(id);
+        if (!optionalBoardScrap.isPresent()) {
+            return ServiceResult.fail("스크랩한 게시글이 존재하지 않습니다.");
+        }
+        BoardScrap boardScrap = optionalBoardScrap.get();
+
+        Optional<AppUser> optionalAppUser = userRepository.findByEmail(email);
+        if (!optionalAppUser.isPresent()) {
+            return ServiceResult.fail("회원 정보가 존재하지 않습니다.");
+        }
+        AppUser user = optionalAppUser.get();
+
+        if (user.getId() != boardScrap.getUser().getId()) {
+            return ServiceResult.fail("회원 정보가 일치하지 않습니다.");
+        }
+
+        boardScrapRepository.delete(boardScrap);
+        return ServiceResult.success();
+    }
+
 
 }
