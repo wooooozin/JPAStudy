@@ -3,6 +3,9 @@ package com.example.jpa.user.controller;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.example.jpa.board.entity.Board;
+import com.example.jpa.board.service.BoardService;
+import com.example.jpa.common.model.ResponseResult;
 import com.example.jpa.notice.entity.Notice;
 import com.example.jpa.notice.entity.NoticeLike;
 import com.example.jpa.notice.model.NoticeResponse;
@@ -40,6 +43,7 @@ public class ApiUserController {
     private final UserRepository userRepository;
     private final NoticeRepository noticeRepository;
     private final NoticeLikeRepository noticeLikeRepository;
+    private final BoardService boardService;
 
     /*
     @PostMapping("/api/user")
@@ -398,6 +402,21 @@ public class ApiUserController {
 
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/api/user/board/post")
+    public ResponseEntity<?> myPost(
+            @RequestHeader("Z-TOKEN") String token
+    ) {
+        String email = "";
+        try {
+            email = JWTUtils.getIssuer(token);
+        } catch (SignatureVerificationException e) {
+            return ResponseResult.fail("Token 정보가 정확하지 않습니다.");
+        }
+
+        List<Board> boards = boardService.postList(email);
+        return ResponseResult.success(boards);
     }
 
 }

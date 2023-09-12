@@ -1,5 +1,6 @@
 package com.example.jpa.board.service;
 
+import com.example.jpa.board.entity.Board;
 import com.example.jpa.board.entity.BoardBadReport;
 import com.example.jpa.board.entity.BoardType;
 import com.example.jpa.board.model.*;
@@ -40,4 +41,6 @@ public interface BoardService {
     ServiceResult addBookmark(Long id, String email);
 
     ServiceResult removeBookmar(Long id, String email);
+
+    List<Board> postList(String email);
 }

@@ -3,6 +3,7 @@ package com.example.jpa.board.service;
 import com.example.jpa.board.entity.*;
 import com.example.jpa.board.model.*;
 import com.example.jpa.board.repository.*;
+import com.example.jpa.common.exception.BizException;
 import com.example.jpa.user.entity.AppUser;
 import com.example.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -352,6 +353,17 @@ public class BoardServiceImpl implements BoardService {
         }
         boardBookmarkRepository.delete(boardBookmark);
         return ServiceResult.success();
+    }
+
+    @Override
+    public List<Board> postList(String email) {
+        Optional<AppUser> optionalAppUser = userRepository.findByEmail(email);
+        if (!optionalAppUser.isPresent()) {
+            throw new BizException("회원정보가 존재하지 않습니다.");
+        }
+        AppUser user = optionalAppUser.get();
+        List<Board> boards = boardRepository.findByUser(user);
+        return boards;
     }
 
 
