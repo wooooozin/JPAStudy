@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.example.jpa.board.entity.Board;
+import com.example.jpa.board.entity.BoardComment;
 import com.example.jpa.board.service.BoardService;
 import com.example.jpa.common.model.ResponseResult;
 import com.example.jpa.notice.entity.Notice;
@@ -419,4 +420,18 @@ public class ApiUserController {
         return ResponseResult.success(boards);
     }
 
+    @GetMapping("/api/user/board/comment")
+    public ResponseEntity<?> myComments(
+        @RequestHeader("Z-TOKEN") String token
+    ) {
+        String email = "";
+        try {
+            email = JWTUtils.getIssuer(token);
+        } catch (SignatureVerificationException e) {
+            return ResponseResult.fail("Token 정보가 정확하지 않습니다.");
+        }
+
+        List<BoardComment> list = boardService.commentList(email);
+        return ResponseResult.success(list);
+    }
 }
