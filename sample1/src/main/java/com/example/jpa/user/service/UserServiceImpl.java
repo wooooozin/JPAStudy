@@ -1,16 +1,19 @@
 package com.example.jpa.user.service;
 
 import com.example.jpa.board.model.ServiceResult;
+import com.example.jpa.common.exception.BizException;
 import com.example.jpa.common.model.ResponseResult;
 import com.example.jpa.user.entity.AppUser;
 import com.example.jpa.user.entity.UserInterest;
 import com.example.jpa.user.model.UserLogCount;
+import com.example.jpa.user.model.UserLogin;
 import com.example.jpa.user.model.UserNoticeCount;
 import com.example.jpa.user.model.UserStatus;
 import com.example.jpa.user.model.UserSummary;
 import com.example.jpa.user.repository.UserCustomRepository;
 import com.example.jpa.user.repository.UserInterestRepository;
 import com.example.jpa.user.repository.UserRepository;
+import com.example.jpa.util.PasswordUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -116,5 +119,19 @@ public class UserServiceImpl implements UserService {
 
         userInterestRepository.delete(interestUser);
         return ServiceResult.success();
+    }
+
+    @Override
+    public AppUser login(UserLogin userLogin) {
+        Optional<AppUser> optionalUser = userRepository.findByEmail(userLogin.getEmail());
+        if (!optionalUser.isPresent()) {
+            throw new BizException("회원 정보가 없습니다.");
+        }
+        AppUser user = optionalUser.get();
+        if (!PasswordUtils.equalPassword(userLogin.getPassword(), user.getPassword())) {
+            throw new BizException("일치하지 정보가 없습니다.");
+        }
+
+        return user;
     }
 }

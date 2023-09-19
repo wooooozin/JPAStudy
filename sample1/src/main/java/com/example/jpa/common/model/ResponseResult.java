@@ -12,6 +12,10 @@ public class ResponseResult {
         return ResponseEntity.badRequest().body(ResponseMessage.fail(message));
     }
 
+    public static ResponseEntity<?> fail(String message, Object data) {
+        return ResponseEntity.badRequest().body(ResponseMessage.fail(message, data));
+    }
+
     public static ResponseEntity<?> success() {
         return success(null);
     }
