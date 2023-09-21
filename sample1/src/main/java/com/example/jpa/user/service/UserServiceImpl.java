@@ -3,6 +3,7 @@ package com.example.jpa.user.service;
 import com.example.jpa.board.model.ServiceResult;
 import com.example.jpa.common.exception.BizException;
 import com.example.jpa.common.model.ResponseResult;
+import com.example.jpa.logs.service.LogsService;
 import com.example.jpa.user.entity.AppUser;
 import com.example.jpa.user.entity.UserInterest;
 import com.example.jpa.user.model.UserLogCount;
@@ -28,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserCustomRepository userCustomRepository;
     private final UserInterestRepository userInterestRepository;
+    private final LogsService logsService;
 
     @Override
     public UserSummary getUserStatusCount() {

@@ -6,11 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import lombok.ToString;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
+@ToString
 public class UserLogin {
     @NotBlank(message = "이메일 항복은 필수 입니다.")
     private String email;
