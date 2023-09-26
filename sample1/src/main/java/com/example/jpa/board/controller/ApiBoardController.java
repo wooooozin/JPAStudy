@@ -1,9 +1,11 @@
 package com.example.jpa.board.controller;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.example.jpa.board.entity.Board;
 import com.example.jpa.board.entity.BoardType;
 import com.example.jpa.board.model.*;
 import com.example.jpa.board.service.BoardService;
+import com.example.jpa.common.exception.BizException;
 import com.example.jpa.common.model.ResponseResult;
 import com.example.jpa.notice.model.ResponseError;
 import com.example.jpa.user.model.ResponseMessage;
@@ -189,5 +191,16 @@ public class ApiBoardController {
         }
         ServiceResult result = boardService.addBadReport(id, email, boardBadReportInput);
         return ResponseResult.result(result);
+    }
+
+    @GetMapping("/api/board/{id}")
+    public ResponseEntity<?> detail(@PathVariable Long id) {
+        Board board = null;
+        try {
+            board = boardService.setail(id);
+        } catch (BizException e) {
+            return ResponseResult.fail(e.getMessage());
+        }
+        return ResponseResult.success(board);
     }
 }
