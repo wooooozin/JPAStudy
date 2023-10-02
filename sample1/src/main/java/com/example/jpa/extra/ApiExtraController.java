@@ -1,6 +1,7 @@
 package com.example.jpa.extra;
 
 import com.example.jpa.common.model.ResponseResult;
+import com.example.jpa.extra.model.DustInput;
 import com.example.jpa.extra.model.OpenApiResult;
 import com.example.jpa.extra.model.PharmacySearch;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -90,4 +91,26 @@ public class ApiExtraController {
 
         return ResponseResult.success(jsonResult);
     }
+
+
+    @GetMapping("/api/extra/dust")
+    public ResponseEntity<?> fineDust(@RequestBody DustInput dustInput) {
+        String apiResult = "";
+        String apiKey = "4ai%2FD6l7vfzncAjYnLRRlEgF2w3Oj4mT%2BBs6SJ96GZyL4Nj27cirw14KcDkSR6DddR6AbH%2B0VNWxl0ac8HbUbA%3D%3D";
+        String url = "https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?serviceKey=%s&returnType=xml&numOfRows=100&pageNo=1&sidoName=%s";
+        try {
+            URI uri = new URI(String.format(url, apiKey, URLEncoder.encode(dustInput.getSearchSido(), "UTF-8")));
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            apiResult = restTemplate.getForObject(uri, String.class);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ResponseResult.success(apiResult);
+    }
+
 }
